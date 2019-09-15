@@ -34,3 +34,13 @@ def str2hex(data):  # we need it for python 2+3 compatibility
         data = bytes(data, 'ascii')
     hexed = binascii.hexlify(data)
     return hexed
+
+
+def bytes_to_version(data):
+    intval = usint(data, 0)
+
+    major = (intval >> 28) & 0x7
+    minor = (intval >> 24) & 0xf
+    bugfix = (intval >> 16) & 0xff
+    build = intval & 0xffff
+    return "{}.{}.{:x}.{:x}".format(major, minor, bugfix, build)

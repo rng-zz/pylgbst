@@ -4,7 +4,7 @@ import time
 from pylgbst import get_connection_auto
 from pylgbst.messages import *
 from pylgbst.peripherals import *
-from pylgbst.utilities import str2hex, usbyte, ushort
+from pylgbst.utilities import str2hex, usbyte, ushort, bytes_to_version
 from pylgbst.utilities import queue
 
 log = logging.getLogger('hub')
@@ -232,6 +232,11 @@ class MoveHub(Hub):
 
     def _report_status(self):
         # maybe add firmware version
+        fwver = self.send(MsgHubProperties(MsgHubProperties.FW_VERSION, MsgHubProperties.UPD_REQUEST))
+        hwver = self.send(MsgHubProperties(MsgHubProperties.HW_VERSION, MsgHubProperties.UPD_REQUEST))
+        radiover = self.send(MsgHubProperties(MsgHubProperties.RADIO_FW_VERSION, MsgHubProperties.UPD_REQUEST))
+        log.info("Hardware v%s, Firmware v%s, Radio Firmware v%s" % bytes_to_version(hwver), bytes_to_version(fwver), radiover)
+
         name = self.send(MsgHubProperties(MsgHubProperties.ADVERTISE_NAME, MsgHubProperties.UPD_REQUEST))
         mac = self.send(MsgHubProperties(MsgHubProperties.PRIMARY_MAC, MsgHubProperties.UPD_REQUEST))
         log.info("%s on %s", name.payload, str2hex(mac.payload))

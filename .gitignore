@@ -3,5 +3,7 @@
 *.pyc
 build
 *.avi
+*.swp
+*.egg-info
 test_real.py
 .vscode/settings.json
