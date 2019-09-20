@@ -165,6 +165,14 @@ class Hub(object):
     def switch_off(self):
         self.send(MsgHubAction(MsgHubAction.SWITCH_OFF))
 
+    def is_fw_locked(self):
+        resp = self.send(MsgFWUpdateLockStatusRequest())
+        locked = usbyte(resp.payload, 0)
+        return locked == 0
+
+    def enter_boot_mode(self):
+        self.send(MsgFWUpdateEnterBootMode())
+
 
 class MoveHub(Hub):
     """
@@ -235,7 +243,10 @@ class MoveHub(Hub):
         fwver = self.send(MsgHubProperties(MsgHubProperties.FW_VERSION, MsgHubProperties.UPD_REQUEST))
         hwver = self.send(MsgHubProperties(MsgHubProperties.HW_VERSION, MsgHubProperties.UPD_REQUEST))
         radiover = self.send(MsgHubProperties(MsgHubProperties.RADIO_FW_VERSION, MsgHubProperties.UPD_REQUEST))
-        log.info("Hardware v%s, Firmware v%s, Radio Firmware v%s" % bytes_to_version(hwver), bytes_to_version(fwver), radiover)
+        fwver = bytes_to_version(fwver.payload)
+        hwver = bytes_to_version(hwver.payload)
+        radiover = radiover = radiover.payload
+        log.info("Hardware v%s, Firmware v%s, Radio Firmware v%s" % (hwver, fwver, radiover))
 
         name = self.send(MsgHubProperties(MsgHubProperties.ADVERTISE_NAME, MsgHubProperties.UPD_REQUEST))
         mac = self.send(MsgHubProperties(MsgHubProperties.PRIMARY_MAC, MsgHubProperties.UPD_REQUEST))

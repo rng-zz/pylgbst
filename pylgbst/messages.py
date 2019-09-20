@@ -325,6 +325,46 @@ class MsgGenericError(UpstreamMsg):
         return "Command 0x%x caused error 0x%x: %s" % (self.cmd, self.err, self.DESCR[self.err])
 
 
+class MsgFWUpdateEnterBootMode(DownstreamMsg):
+    """
+    https://lego.github.io/lego-ble-wireless-protocol-docs/index.html#f-w-update-go-into-boot-mode
+    """
+    TYPE = 0x10
+
+    def bytes(self):
+        self.payload = "LPF2-Boot"
+        return super(MsgFWUpdateEnterBootMode, self).bytes()
+
+
+class MsgFWUpdateLockStatusRequest(DownstreamMsg):
+    """
+    https://lego.github.io/lego-ble-wireless-protocol-docs/index.html#f-w-lock-status-request
+    """
+    TYPE = 0x12
+    
+    def __init__(self):
+        super(MsgFWUpdateLockStatusRequest, self).__init__()
+        self.needs_reply = True
+    
+    def bytes(self):
+        self.payload = ""
+        return super(MsgFWUpdateLockStatusRequest, self).bytes()
+
+    def is_reply(self, msg):
+        return isinstance(msg, MsgFWUpdateLockStatus)
+
+
+class MsgFWUpdateLockStatus(UpstreamMsg):
+    """
+    https://lego.github.io/lego-ble-wireless-protocol-docs/index.html#f-w-lock-status
+    """
+    TYPE = 0x13
+    
+    @classmethod
+    def decode(cls, data):
+        return super(MsgFWUpdateLockStatus, cls).decode(data)
+
+
 class MsgPortInfoRequest(DownstreamMsg):
     """
     This is sync request for value on port
@@ -740,5 +780,5 @@ UPSTREAM_MSGS = (
     MsgHubProperties, MsgHubAction, MsgHubAlert, MsgHubAttachedIO, MsgGenericError,
     MsgPortInfo, MsgPortModeInfo,
     MsgPortValueSingle, MsgPortValueCombined, MsgPortInputFmtSingle, MsgPortInputFmtCombined,
-    MsgPortOutputFeedback
+    MsgPortOutputFeedback, MsgFWUpdateLockStatus
 )
